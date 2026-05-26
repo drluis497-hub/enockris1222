@@ -1,0 +1,608 @@
+import { useState, useEffect } from "react";
+
+export default function App() {
+  const [firstName, setFirstName] = useState("");
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [visibleElements, setVisibleElements] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute("data-animate");
+            if (id) {
+              setVisibleElements(prev => new Set([...prev, id]));
+            }
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
+    );
+
+    document.querySelectorAll("[data-animate]").forEach(el => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!firstName.trim()) {
+      alert("Please enter your first name.");
+      return;
+    }
+    if (!email.trim() || !email.includes("@")) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setIsSubmitting(false);
+    setIsSuccess(true);
+  };
+
+  const scrollToSignup = (e: React.MouseEvent) => {
+    e.preventDefault();
+    document.getElementById("signup")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  return (
+    <div className="min-h-screen bg-[#030308] text-[#f8f4ff] font-['Syne'] selection:bg-[#6b21e8]/30 selection:text-white overflow-x-hidden">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Syne:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap');
+        
+        * { font-family: 'Syne', sans-serif; }
+        .font-orbitron { font-family: 'Orbitron', monospace !important; }
+        .font-mono-jet { font-family: 'JetBrains Mono', monospace !important; }
+        
+        @keyframes float {
+          0%, 100% { transform: translateY(0) rotateY(-8deg); }
+          50% { transform: translateY(-18px) rotateY(-5deg); }
+        }
+        @keyframes orb-drift {
+          from { transform: translate(0,0) scale(1); }
+          to { transform: translate(30px,20px) scale(1.05); }
+        }
+        @keyframes bg-shift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes pulse-dot {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.5); opacity: 0.6; }
+        }
+        @keyframes bounce {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.2); }
+        }
+        
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #030308; }
+        ::-webkit-scrollbar-thumb { background: #6b21e8; border-radius: 2px; }
+      `}</style>
+
+      {/* Noise Texture Overlay */}
+      <div className="fixed inset-0 pointer-events-none z-[1000] opacity-[0.04] mix-blend-screen" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`
+      }} />
+
+      {/* NAV */}
+      <nav className="fixed top-0 inset-x-0 z-[900] px-10 py-[18px] flex justify-between items-center backdrop-blur-[20px] bg-[#030308]/85 border-b border-[#6b21e8]/15 max-[900px]:px-5 max-[900px]:py-4">
+        <div className="font-orbitron text-[13px] tracking-[3px] text-[#f5c842] uppercase">AI Income System</div>
+        <a href="#signup" onClick={scrollToSignup} className="hidden md:inline-flex text-[12px] tracking-[2px] px-[22px] py-[10px] bg-gradient-to-br from-[#6b21e8] to-[#a855f7] rounded text-white font-semibold uppercase hover:shadow-[0_0_24px_rgba(107,33,232,0.45)] hover:-translate-y-[1px] transition-all">
+          Get Free Access
+        </a>
+      </nav>
+
+      {/* HERO */}
+      <section id="hero" className="min-h-screen flex items-center relative overflow-hidden pt-[120px] pb-20 px-10 max-[900px]:px-5 max-[900px]:pt-[100px] max-[900px]:pb-[60px]">
+        {/* Grid Background */}
+        <div className="absolute inset-0 opacity-20" style={{
+          backgroundImage: `linear-gradient(rgba(107,33,232,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(107,33,232,0.07) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+          maskImage: 'radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent)'
+        }} />
+        
+        {/* Orbs */}
+        <div className="absolute w-[600px] h-[600px] rounded-full -top-[100px] -right-[100px]" style={{
+          background: 'radial-gradient(circle, rgba(107,33,232,0.18) 0%, transparent 70%)',
+          animation: 'orb-drift 8s ease-in-out infinite alternate'
+        }} />
+        <div className="absolute w-[400px] h-[400px] rounded-full -bottom-[50px] left-[10%]" style={{
+          background: 'radial-gradient(circle, rgba(0,245,212,0.1) 0%, transparent 70%)',
+          animation: 'orb-drift 12s ease-in-out infinite alternate-reverse'
+        }} />
+
+        <div className="relative z-10 max-w-[1200px] mx-auto w-full grid lg:grid-cols-[1fr_420px] gap-20 items-center max-[900px]:grid-cols-1 max-[900px]:gap-12 max-[900px]:text-center">
+          <div className="order-2 lg:order-1">
+            <div className="inline-flex items-center gap-2 font-mono-jet text-[11px] tracking-[3px] text-[#00f5d4] uppercase px-4 py-2 bg-[#00f5d4]/[0.08] border border-[#00f5d4]/20 rounded-[2px] mb-7">
+              <span>◆</span> Free Ebook — 2026 Edition
+            </div>
+            
+            <h1 className="font-orbitron text-[clamp(32px,4.5vw,62px)] font-black leading-[1.08] tracking-[-1px] mb-6">
+              Learn <span className="bg-gradient-to-br from-[#f5c842] via-[#fde68a] to-[#f5c842] bg-clip-text text-transparent">AI Digital Skills</span><br />
+              That Can <span className="text-[#a855f7]">Make You Money</span><br />
+              in 2026
+            </h1>
+            
+            <p className="text-[clamp(15px,1.6vw,18px)] text-[#f8f4ff]/65 leading-[1.7] max-w-[540px] mb-10 max-[900px]:max-w-none">
+              Discover step-by-step AI systems, monetization strategies, tools, and income blueprints designed for beginners. No experience needed.
+            </p>
+            
+            <div className="flex flex-col items-start gap-4 max-[900px]:items-center">
+              <a href="#signup" onClick={scrollToSignup} className="group inline-flex items-center gap-3 px-10 py-[18px] bg-[length:200%_200%] rounded-[6px] text-white font-orbitron text-[13px] font-bold tracking-[2px] uppercase cursor-pointer relative overflow-hidden transition-all hover:shadow-[0_0_40px_rgba(107,33,232,0.45),0_0_80px_rgba(107,33,232,0.2)] hover:-translate-y-[2px]" style={{
+                background: 'linear-gradient(135deg,#7c3aed,#a855f7,#7c3aed)',
+                animation: 'bg-shift 3s linear infinite',
+                border: '1px solid rgba(168,85,247,0.4)'
+              }}>
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+                Get Instant Access <span className="text-[18px] group-hover:translate-x-1 transition-transform">→</span>
+              </a>
+              
+              <div className="flex items-center gap-2 font-mono-jet text-[11px] tracking-[1.5px] text-[#9490a8]">
+                <span className="w-[6px] h-[6px] rounded-full bg-[#00f5d4] shadow-[0_0_8px_#00f5d4] animate-[pulse-dot_2s_ease_infinite]" />
+                No experience needed · 100% Free · Instant Download
+              </div>
+            </div>
+          </div>
+
+          {/* BOOK MOCKUP */}
+          <div className="flex justify-center order-1 lg:order-2">
+            <div className="relative w-[280px]" style={{ animation: 'float 4s ease-in-out infinite' }}>
+              <div className="absolute -inset-5 bg-[radial-gradient(ellipse_at_center,rgba(107,33,232,0.25)_0%,transparent_70%)] -z-10 pointer-events-none" />
+              
+              <div className="relative" style={{ transformStyle: 'preserve-3d', perspective: '800px' }}>
+                {/* Spine */}
+                <div className="absolute left-[-8px] top-0 w-2 h-full rounded-l-[3px] border border-[#6b21e8]/30 border-r-0" style={{
+                  background: 'linear-gradient(180deg, #2d1060, #1a0035, #2d1060)'
+                }} />
+                
+                {/* Cover */}
+                <div className="relative w-[280px] aspect-[3/4] rounded-[4px_12px_12px_4px] border border-[#6b21e8]/50 overflow-hidden" style={{
+                  background: 'linear-gradient(145deg, #0f0020, #1a0035, #0d001a)',
+                  boxShadow: '-8px 0 0 rgba(0,0,0,0.4), 0 20px 60px rgba(107,33,232,0.4), 0 0 0 1px rgba(245,200,66,0.15), inset 0 0 80px rgba(107,33,232,0.15)'
+                }}>
+                  {/* Hex grid */}
+                  <div className="absolute inset-0 opacity-[0.12]" style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='32'%3E%3Cpath d='M14 2L26 9v14L14 30 2 23V9z' fill='none' stroke='%23a855f7' stroke-width='0.5'/%3E%3C/svg%3E")`,
+                    backgroundSize: '28px 32px'
+                  }} />
+                  
+                  {/* Orb */}
+                  <div className="absolute w-[180px] h-[180px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{
+                    background: 'radial-gradient(circle, rgba(107,33,232,0.6) 0%, transparent 70%)'
+                  }} />
+                  
+                  {/* Content */}
+                  <div className="absolute inset-0 flex flex-col p-6 pt-[24px] pr-5 pb-5 pl-5">
+                    <div className="font-mono-jet text-[7px] tracking-[3px] text-[#f5c842] uppercase bg-[#f5c842]/10 border border-[#f5c842]/30 px-[10px] py-1 rounded-[2px] w-fit mb-2">
+                      ◆ 2026 Edition
+                    </div>
+                    
+                    <div className="text-[42px] mb-2 text-center drop-shadow-[0_0_16px_rgba(107,33,232,0.8)]">🤖</div>
+                    
+                    <div className="font-orbitron text-[14px] font-black text-white leading-[1.2] tracking-[1px] uppercase mb-[6px] [text-shadow:0_0_20px_rgba(168,85,247,0.8)]">
+                      <span className="text-[#f5c842] [text-shadow:0_0_20px_rgba(245,200,66,0.6)]">AI DIGITAL</span><br />
+                      SKILLS TO<br />
+                      MAKE MONEY
+                    </div>
+                    
+                    <div className="text-[8px] tracking-[2px] text-[#a855f7]/85 uppercase mb-auto">The Complete AI Income System</div>
+                    
+                    <div className="flex justify-between items-end">
+                      <div>
+                        <div className="font-orbitron text-[20px] font-black text-[#f5c842] [text-shadow:0_0_20px_#c49a0a]">FREE</div>
+                        <div className="text-[7px] text-[#9490a8] tracking-[1px]">Instant Download</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-[9px] text-[#f5c842] tracking-[1px]">★★★★★</div>
+                        <div className="text-[7px] text-[#9490a8] tracking-[1px]">4.9 / 5 Rating</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* URGENCY BANNER */}
+      <div className="px-10 py-7 bg-gradient-to-r from-[#f5c842]/[0.07] to-[#6b21e8]/[0.07] border-y border-[#f5c842]/20 max-[600px]:px-5">
+        <div className="max-w-[1200px] mx-auto flex items-center gap-5 flex-wrap max-[600px]:justify-center max-[600px]:text-center">
+          <span className="text-[28px] animate-[pulse-dot_2s_ease_infinite]">⚡</span>
+          <p className="font-semibold text-[16px] text-[#fde68a] leading-[1.5] flex-1 max-[600px]:text-center">
+            <span className="text-white">AI is changing digital business fast.</span> Learn the skills now before the market becomes overcrowded — the window to build a competitive edge is closing.
+          </p>
+          <div className="h-[3px] flex-1 min-w-20 bg-gradient-to-r from-[#f5c842] to-transparent rounded-[2px] max-[600px]:hidden" />
+        </div>
+      </div>
+
+      <div className="h-[1px] mx-10 bg-gradient-to-r from-transparent via-[#6b21e8]/40 via-[#f5c842]/30 to-transparent max-[900px]:mx-5" />
+
+      {/* WHAT YOU'LL LEARN */}
+      <section id="learn" className="py-[100px] px-10 bg-gradient-to-b from-[#030308] to-[#0a0a16] max-[900px]:py-[70px] max-[900px]:px-5">
+        <div className="max-w-[1200px] mx-auto">
+          <div data-animate="learn-label" className={`font-mono-jet text-[10px] tracking-[4px] text-[#00f5d4] uppercase flex items-center gap-3 mb-4 transition-all duration-700 ${visibleElements.has('learn-label') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            <span>What You'll Learn</span>
+            <span className="flex-1 max-w-[60px] h-[1px] bg-gradient-to-r from-[#00f5d4] to-transparent" />
+          </div>
+          
+          <h2 data-animate="learn-title" className={`font-orbitron text-[clamp(24px,3.5vw,42px)] font-extrabold leading-[1.15] mb-4 transition-all duration-700 delay-100 ${visibleElements.has('learn-title') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            7 <span className="bg-gradient-to-br from-[#a855f7] to-[#bf5af2] bg-clip-text text-transparent">AI Skill Areas</span> That<br />Generate Real Income
+          </h2>
+          
+          <p data-animate="learn-sub" className={`text-[16px] text-[#f8f4ff]/55 leading-[1.7] max-w-[560px] mb-[60px] transition-all duration-700 delay-200 ${visibleElements.has('learn-sub') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            Each module is engineered for action — not theory. Learn, implement, earn.
+          </p>
+
+          <div className="grid auto-rows-fr gap-5 grid-cols-[repeat(auto-fill,minmax(280px,1fr))]">
+            {[
+              { icon: "💰", title: "AI Tools That Make Money", desc: "Discover the exact AI platforms that professionals use to generate income — from writing tools to image generators and automation apps.", tag: "MONETIZATION" },
+              { icon: "🎨", title: "Content Creation with AI", desc: "Create scroll-stopping content 10x faster using AI. Build blogs, videos, social posts, and graphics that attract an audience and clients.", tag: "CONTENT" },
+              { icon: "⚙️", title: "AI Monetization Systems", desc: "Build repeatable income systems using AI — digital products, services, subscriptions, and affiliate pipelines that scale without you.", tag: "SYSTEMS" },
+              { icon: "💼", title: "Freelancing with AI", desc: "Land high-paying freelance clients by offering AI-powered services. Learn how to price, package, and deliver value faster than the competition.", tag: "FREELANCE" },
+              { icon: "🔄", title: "Automation Workflows", desc: "Design automated pipelines that do the heavy lifting. Connect AI tools to eliminate repetitive tasks and unlock more productive hours.", tag: "AUTOMATION" },
+              { icon: "📱", title: "Social Media Growth", desc: "Master AI-powered social strategies to grow an engaged audience across TikTok, Instagram, YouTube, and LinkedIn — and monetize that growth.", tag: "GROWTH" },
+              { icon: "🌐", title: "Digital Income Strategies", desc: "Explore 10+ proven digital income models — from selling prompts and templates to building AI-powered SaaS micro-tools and info products.", tag: "INCOME" }
+            ].map((card, i) => (
+              <div key={i} data-animate={`card-${i}`} className={`group p-7 bg-[#ffffff07] border border-[#6b21e8]/22 rounded-xl relative overflow-hidden transition-all duration-300 hover:border-[#6b21e8]/50 hover:-translate-y-1 hover:shadow-[0_16px_48px_rgba(107,33,232,0.15)] ${visibleElements.has(`card-${i}`) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`} style={{ transitionDelay: `${i * 80}ms` }}>
+                <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[#a855f7] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="text-[36px] mb-4 block drop-shadow-[0_0_10px_rgba(107,33,232,0.6)]">{card.icon}</span>
+                <h3 className="font-orbitron text-[13px] font-bold tracking-[1px] mb-[10px] text-white">{card.title}</h3>
+                <p className="text-[14px] leading-[1.65] text-[#f8f4ff]/50">{card.desc}</p>
+                <span className="inline-block mt-[14px] font-mono-jet text-[9px] tracking-[2px] text-[#00f5d4] bg-[#00f5d4]/7 border border-[#00f5d4]/15 px-[10px] py-1 rounded-[2px]">{card.tag}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="h-[1px] mx-10 bg-gradient-to-r from-transparent via-[#6b21e8]/40 via-[#f5c842]/30 to-transparent max-[900px]:mx-5" />
+
+      {/* WHAT'S INSIDE */}
+      <section id="inside" className="py-[100px] px-10 bg-[#0a0a16] max-[900px]:py-[70px] max-[900px]:px-5">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="grid lg:grid-cols-2 gap-[60px] items-center max-[900px]:grid-cols-1">
+            <div>
+              <div data-animate="inside-label" className={`font-mono-jet text-[10px] tracking-[4px] text-[#00f5d4] uppercase flex items-center gap-3 mb-4 transition-all duration-700 ${visibleElements.has('inside-label') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+                <span>What's Inside</span>
+                <span className="flex-1 max-w-[60px] h-[1px] bg-gradient-to-r from-[#00f5d4] to-transparent" />
+              </div>
+              
+              <h2 data-animate="inside-title" className={`font-orbitron text-[clamp(24px,3.5vw,42px)] font-extrabold leading-[1.15] mb-4 transition-all duration-700 delay-100 ${visibleElements.has('inside-title') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+                Everything You Need to<br />
+                <span className="bg-gradient-to-br from-[#f5c842] to-[#fde68a] bg-clip-text text-transparent">Start Earning with AI</span>
+              </h2>
+              
+              <p data-animate="inside-sub" className={`text-[16px] text-[#f8f4ff]/55 leading-[1.7] max-w-[560px] mb-[60px] transition-all duration-700 delay-200 ${visibleElements.has('inside-sub') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+                A complete beginner-to-earner blueprint — structured to get you results fast.
+              </p>
+
+              <div className="flex flex-col gap-0">
+                {[
+                  { icon: "🧠", title: "7 Core AI Skills That Pay", desc: "The exact skills in highest demand right now — ranked by income potential and ease of entry." },
+                  { icon: "🗺️", title: "Step-by-Step Income Systems", desc: "Follow-along blueprints that take you from zero to your first AI income stream." },
+                  { icon: "💲", title: "Pricing & Monetization Blueprints", desc: "Exact pricing frameworks so you never undercharge again. Charge what you're worth." },
+                  { icon: "🎯", title: "Client Acquisition Blueprint", desc: "Where to find clients, how to pitch them, and how to close without sounding salesy." },
+                  { icon: "📅", title: "7-Day Action Plan", desc: "A day-by-day roadmap to go from \"just downloaded\" to actively building income." },
+                  { icon: "📋", title: "Worksheets & Checklists", desc: "Fillable templates and checklists so you always know your next move." },
+                  { icon: "🔧", title: "Tools & Resources Directory", desc: "The exact tools used by top AI earners — including free options to get started today." }
+                ].map((item, i) => (
+                  <div key={i} data-animate={`check-${i}`} className={`group flex items-start gap-4 py-5 border-b border-[#6b21e8]/12 last:border-0 transition-all duration-500 ${visibleElements.has(`check-${i}`) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`} style={{ transitionDelay: `${i * 50}ms` }}>
+                    <div className="w-9 h-9 shrink-0 bg-gradient-to-br from-[#6b21e8]/20 to-[#a855f7]/10 border border-[#6b21e8]/35 rounded-lg flex items-center justify-center text-[16px] group-hover:scale-110 transition-transform">
+                      {item.icon}
+                    </div>
+                    <div>
+                      <h3 className="text-[15px] font-bold text-white mb-1">{item.title}</h3>
+                      <p className="text-[13px] leading-[1.6] text-[#f8f4ff]/45">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div data-animate="inside-visual" className={`relative flex justify-center transition-all duration-700 delay-300 max-[900px]:hidden ${visibleElements.has('inside-visual') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+              <div className="relative w-[320px] h-[380px]">
+                {[
+                  { label: "Chapter 01", num: "7", text: "Core AI Skills", rotate: "-4deg", left: "20px", top: "0", z: 0 },
+                  { label: "⭐ Featured", num: "10+", text: "Income Models", rotate: "0deg", left: "0", top: "30px", z: 2, border: "rgba(245,200,66,0.3)" },
+                  { label: "Bonus", num: "7", text: "Day Action Plan", rotate: "3deg", left: "40px", top: "60px", z: 1 }
+                ].map((card, i) => (
+                  <div key={i} className="absolute w-[280px] p-6 bg-gradient-to-br from-[#1a0a2e]/90 to-[#07070f]/90 border border-[#6b21e8]/30 rounded-2xl backdrop-blur-[10px] transition-transform hover:scale-[1.02]" style={{
+                    top: card.top, left: card.left, zIndex: card.z, transform: `rotate(${card.rotate})`,
+                    borderColor: card.border
+                  }}>
+                    <div className="font-mono-jet text-[9px] tracking-[3px] text-[#f5c842] uppercase mb-3">{card.label}</div>
+                    <div className="font-orbitron text-[48px] font-black text-[#a855f7] opacity-30 leading-none">{card.num}</div>
+                    <div className="text-[18px] font-bold text-white -mt-2">{card.text}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="h-[1px] mx-10 bg-gradient-to-r from-transparent via-[#6b21e8]/40 via-[#f5c842]/30 to-transparent max-[900px]:mx-5" />
+
+      {/* BENEFITS */}
+      <section id="benefits" className="py-[100px] px-10 bg-gradient-to-b from-[#0a0a16] to-[#030308] max-[900px]:py-[70px] max-[900px]:px-5">
+        <div className="max-w-[1200px] mx-auto">
+          <div data-animate="ben-label" className={`font-mono-jet text-[10px] tracking-[4px] text-[#00f5d4] uppercase flex items-center gap-3 mb-4 transition-all duration-700 ${visibleElements.has('ben-label') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            <span>Your Transformation</span>
+            <span className="flex-1 max-w-[60px] h-[1px] bg-gradient-to-r from-[#00f5d4] to-transparent" />
+          </div>
+          
+          <h2 data-animate="ben-title" className={`font-orbitron text-[clamp(24px,3.5vw,42px)] font-extrabold leading-[1.15] mb-4 transition-all duration-700 delay-100 ${visibleElements.has('ben-title') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            From <span className="bg-gradient-to-br from-[#a855f7] to-[#bf5af2] bg-clip-text text-transparent">AI Curious</span> to<br />
+            <span className="bg-gradient-to-br from-[#f5c842] to-[#fde68a] bg-clip-text text-transparent">AI Earning</span>
+          </h2>
+          
+          <p data-animate="ben-sub" className={`text-[16px] text-[#f8f4ff]/55 leading-[1.7] max-w-[560px] mb-[60px] transition-all duration-700 delay-200 ${visibleElements.has('ben-sub') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            This isn't just about learning. It's about changing what's possible for your income.
+          </p>
+
+          <div className="grid auto-rows-fr gap-6 grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
+            {[
+              { num: "01", title: "Save Hours Every Single Week", desc: "Harness AI to automate repetitive tasks, speed up creation, and reclaim the time you used to lose to manual work." },
+              { num: "02", title: "Learn Beginner-Friendly Systems", desc: "No coding. No tech background. No prior experience required. Every system is designed to be understood and applied on day one." },
+              { num: "03", title: "Start Building Digital Income", desc: "Move from consuming content to creating income. The ebook gives you real paths to earning — not hypothetical side hustle ideas." },
+              { num: "04", title: "Understand Real AI Workflows", desc: "See exactly how professionals chain AI tools together to deliver results clients pay premium rates for." },
+              { num: "05", title: "Build Profitable Online Skills", desc: "Develop a future-proof skill set that grows more valuable as AI becomes more embedded in every industry." }
+            ].map((item, i) => (
+              <div key={i} data-animate={`ben-${i}`} className={`group flex items-start gap-5 p-7 bg-[#ffffff07] border border-[#6b21e8]/15 rounded-xl transition-all duration-300 hover:border-[#f5c842]/25 hover:shadow-[0_8px_32px_rgba(245,200,66,0.05)] ${visibleElements.has(`ben-${i}`) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`} style={{ transitionDelay: `${i * 80}ms` }}>
+                <div className="font-orbitron text-[24px] font-black text-[#f5c842] opacity-40 shrink-0 leading-none w-10 text-right">{item.num}</div>
+                <div>
+                  <h3 className="text-[16px] font-bold text-white mb-[6px]">{item.title}</h3>
+                  <p className="text-[13px] leading-[1.65] text-[#f8f4ff]/45">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* EMAIL CAPTURE */}
+      <section id="signup" className="py-[100px] px-10 bg-[#030308] relative overflow-hidden max-[900px]:py-[70px] max-[900px]:px-5">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_50%_50%,rgba(107,33,232,0.08)_0%,transparent_70%)]" />
+        
+        <div className="relative z-10 max-w-[1200px] mx-auto">
+          <div className="max-w-[560px] mx-auto text-center">
+            <div data-animate="form-label" className={`font-mono-jet text-[10px] tracking-[4px] text-[#00f5d4] uppercase flex items-center justify-center gap-3 mb-4 transition-all duration-700 ${visibleElements.has('form-label') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+              <span>Free Instant Access</span>
+              <span className="flex-1 max-w-[60px] h-[1px] bg-gradient-to-r from-[#00f5d4] to-transparent" />
+            </div>
+            
+            <h2 data-animate="form-title" className={`font-orbitron text-[clamp(24px,3.5vw,42px)] font-extrabold leading-[1.15] mb-4 transition-all duration-700 delay-100 ${visibleElements.has('form-title') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+              Get Your Free Copy<br />
+              of the <span className="bg-gradient-to-br from-[#f5c842] to-[#fde68a] bg-clip-text text-transparent">AI Income Ebook</span>
+            </h2>
+            
+            <p data-animate="form-sub" className={`text-[#9490a8] text-[15px] leading-[1.7] mb-12 transition-all duration-700 delay-200 ${visibleElements.has('form-sub') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+              Join thousands of beginners, students, and digital entrepreneurs already using these AI systems.
+            </p>
+
+            <div data-animate="form-box" className={`mt-12 p-12 bg-[#ffffff03] border border-[#6b21e8]/30 rounded-[20px] relative overflow-hidden transition-all duration-700 delay-300 max-[600px]:p-8 max-[600px]:px-5 ${visibleElements.has('form-box') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+              <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#6b21e8] via-[#f5c842] to-transparent" />
+              
+              {!isSuccess ? (
+                <>
+                  <div className="font-orbitron text-[22px] font-extrabold mb-2">🔐 Claim Your Free Ebook</div>
+                  <div className="text-[14px] text-[#9490a8] mb-8 leading-[1.6]">Enter your details below and get instant access. We'll also send you weekly AI income tips.</div>
+                  
+                  <form onSubmit={handleSubmit} className="space-y-4 text-left">
+                    <div>
+                      <label htmlFor="firstName" className="block font-mono-jet text-[10px] tracking-[2px] text-[#9490a8] uppercase mb-2">First Name</label>
+                      <input
+                        type="text"
+                        id="firstName"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="Your first name"
+                        autoComplete="given-name"
+                        className="w-full px-5 py-4 bg-[#ffffff0a] border border-[#6b21e8]/25 rounded-lg text-white placeholder:text-[#9490a8]/40 text-[15px] outline-none focus:border-[#a855f7] focus:shadow-[0_0_0_3px_rgba(107,33,232,0.12)] transition-all"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label htmlFor="email" className="block font-mono-jet text-[10px] tracking-[2px] text-[#9490a8] uppercase mb-2">Email Address</label>
+                      <input
+                        type="email"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="your@email.com"
+                        autoComplete="email"
+                        className="w-full px-5 py-4 bg-[#ffffff0a] border border-[#6b21e8]/25 rounded-lg text-white placeholder:text-[#9490a8]/40 text-[15px] outline-none focus:border-[#a855f7] focus:shadow-[0_0_0_3px_rgba(107,33,232,0.12)] transition-all"
+                      />
+                    </div>
+                    
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="group relative w-full py-[18px] px-6 rounded-lg text-[#0a0a0a] font-orbitron text-[13px] font-black tracking-[2px] uppercase cursor-pointer overflow-hidden transition-all hover:shadow-[0_0_40px_rgba(245,200,66,0.35)] hover:-translate-y-[2px] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                      style={{
+                        background: 'linear-gradient(135deg,#c49a0a,#f5c842,#fde68a,#f5c842)',
+                        backgroundSize: '200% 200%',
+                        animation: 'bg-shift 4s linear infinite'
+                      }}
+                    >
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+                      {isSubmitting ? "⏳ Setting Up Your Access..." : "⚡ Download The Free Ebook"}
+                    </button>
+                  </form>
+                  
+                  <p className="mt-4 text-[11px] text-[#9490a8]/40 leading-[1.6]">🔒 Your information is secure. No spam, ever. Unsubscribe anytime.</p>
+                </>
+              ) : (
+                <div className="text-center py-4 animate-[fadeUp_0.6s_ease_both]">
+                  <div className="text-[56px] mb-5 animate-[bounce_1s_ease]">🎉</div>
+                  <div className="font-orbitron text-[22px] font-extrabold text-[#f5c842] mb-3">Welcome to the AI Income System!</div>
+                  <div className="text-[15px] text-[#9490a8] leading-[1.7] mb-6">
+                    Check your inbox right now — your ebook is on its way. Here's what happens next:
+                  </div>
+                  <div className="flex flex-col gap-3 text-left">
+                    {[
+                      { icon: "📧", text: "Welcome email + ebook download link sent to your inbox" },
+                      { icon: "📘", text: "Your AI Income System ebook is ready to read" },
+                      { icon: "🚀", text: "AI tips, tools & income strategies coming over the next 7 days" }
+                    ].map((step, i) => (
+                      <div key={i} className="flex items-center gap-3 p-[14px_16px] bg-[#00f5d4]/5 border border-[#00f5d4]/15 rounded-lg text-[13px] text-[#f8f4ff]/70">
+                        <span className="text-[18px]">{step.icon}</span>
+                        {step.text}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="h-[1px] mx-10 bg-gradient-to-r from-transparent via-[#6b21e8]/40 via-[#f5c842]/30 to-transparent max-[900px]:mx-5" />
+
+      {/* EMAIL SEQUENCE */}
+      <section id="sequence" className="py-[100px] px-10 bg-[#0a0a16] max-[900px]:py-[70px] max-[900px]:px-5">
+        <div className="max-w-[1200px] mx-auto">
+          <div data-animate="seq-label" className={`font-mono-jet text-[10px] tracking-[4px] text-[#00f5d4] uppercase flex items-center gap-3 mb-4 transition-all duration-700 ${visibleElements.has('seq-label') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            <span>Email Automation</span>
+            <span className="flex-1 max-w-[60px] h-[1px] bg-gradient-to-r from-[#00f5d4] to-transparent" />
+          </div>
+          
+          <h2 data-animate="seq-title" className={`font-orbitron text-[clamp(24px,3.5vw,42px)] font-extrabold leading-[1.15] mb-4 transition-all duration-700 delay-100 ${visibleElements.has('seq-title') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            What Happens After<br />You <span className="bg-gradient-to-br from-[#a855f7] to-[#bf5af2] bg-clip-text text-transparent">Sign Up</span>
+          </h2>
+          
+          <p data-animate="seq-sub" className={`text-[16px] text-[#f8f4ff]/55 leading-[1.7] max-w-[560px] mb-[60px] transition-all duration-700 delay-200 ${visibleElements.has('seq-sub') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            We've built a complete AI income journey — delivered directly to your inbox over 7 days.
+          </p>
+
+          <div className="relative pl-[60px] flex flex-col gap-0 max-[900px]:pl-12">
+            <div className="absolute left-[23px] top-6 bottom-6 w-[2px] bg-gradient-to-b from-[#6b21e8] to-[#6b21e8]/10 max-[900px]:left-[18px]" />
+            
+            {[
+              { dot: "01", active: true, timing: "Immediately → Day 0", title: "🎁 Welcome + Ebook Delivery", desc: "Your free ebook arrives instantly. A warm welcome walks you through what's inside and how to get the most value in the shortest time.", tag: "INSTANT DELIVERY", tagStyle: "bg-[#00f5d4]/[0.08] border-[#00f5d4]/20 text-[#00f5d4]" },
+              { dot: "02", active: false, timing: "Day 2", title: "🛠️ Top AI Tools Beginners Should Start Using", desc: "A curated breakdown of the best free and low-cost AI tools — the exact ones earning creators and freelancers use daily in 2026.", tag: "PURE VALUE", tagStyle: "bg-[#6b21e8]/[0.08] border-[#6b21e8]/25 text-[#a855f7]" },
+              { dot: "03", active: false, timing: "Day 4", title: "💡 How People Are Making Money With AI", desc: "Real-world income case studies — how beginners are earning from content creation, freelancing, digital products, and AI automation services.", tag: "CASE STUDIES", tagStyle: "bg-[#6b21e8]/[0.08] border-[#6b21e8]/25 text-[#a855f7]" },
+              { dot: "04", active: false, timing: "Day 7", title: "🚀 Your Next Step: Go Deeper", desc: "For those ready to accelerate — an exclusive look at premium resources, tools, and communities designed to fast-track your AI income journey.", tag: "UPGRADE OFFER", tagStyle: "bg-[#f5c842]/[0.08] border-[#f5c842]/25 text-[#f5c842]" }
+            ].map((item, i) => (
+              <div key={i} data-animate={`seq-${i}`} className={`relative flex items-start gap-6 py-7 transition-all duration-700 ${visibleElements.has(`seq-${i}`) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`} style={{ transitionDelay: `${i * 100}ms` }}>
+                <div className={`absolute -left-[37px] max-[900px]:-left-[30px] top-[30px] w-5 h-5 bg-[#030308] border-2 rounded-full flex items-center justify-center text-[8px] font-mono-jet font-medium shrink-0 ${item.active ? 'border-[#f5c842] text-[#f5c842] shadow-[0_0_12px_rgba(245,200,66,0.4)]' : 'border-[#6b21e8] text-[#a855f7]'}`}>
+                  {item.dot}
+                </div>
+                
+                <div className="flex-1 p-6 bg-[#ffffff07] border border-[#6b21e8]/22 rounded-xl transition-all hover:border-[#6b21e8]/40">
+                  <div className="font-mono-jet text-[9px] tracking-[2px] text-[#00f5d4] uppercase mb-2">{item.timing}</div>
+                  <h3 className="text-[16px] font-bold text-white mb-[6px]">{item.title}</h3>
+                  <p className="text-[13px] text-[#9490a8] leading-[1.6]">{item.desc}</p>
+                  <span className={`inline-block mt-3 text-[9px] tracking-[1px] px-[10px] py-[3px] rounded-[2px] font-mono-jet border ${item.tagStyle}`}>{item.tag}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="h-[1px] mx-10 bg-gradient-to-r from-transparent via-[#6b21e8]/40 via-[#f5c842]/30 to-transparent max-[900px]:mx-5" />
+
+      {/* SOCIAL PROOF */}
+      <section id="proof" className="py-[100px] px-10 bg-[#030308] max-[900px]:py-[70px] max-[900px]:px-5">
+        <div className="max-w-[1200px] mx-auto">
+          <div data-animate="proof-label" className={`font-mono-jet text-[10px] tracking-[4px] text-[#00f5d4] uppercase flex items-center gap-3 mb-4 transition-all duration-700 ${visibleElements.has('proof-label') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            <span>Social Proof</span>
+            <span className="flex-1 max-w-[60px] h-[1px] bg-gradient-to-r from-[#00f5d4] to-transparent" />
+          </div>
+          
+          <h2 data-animate="proof-title" className={`font-orbitron text-[clamp(24px,3.5vw,42px)] font-extrabold leading-[1.15] mb-4 transition-all duration-700 delay-100 ${visibleElements.has('proof-title') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            Real People. <span className="bg-gradient-to-br from-[#a855f7] to-[#bf5af2] bg-clip-text text-transparent">Real Results.</span>
+          </h2>
+          
+          <p data-animate="proof-sub" className={`text-[16px] text-[#f8f4ff]/55 leading-[1.7] max-w-[560px] mb-[60px] transition-all duration-700 delay-200 ${visibleElements.has('proof-sub') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            Thousands of beginners have already downloaded the ebook and started their AI income journey.
+          </p>
+
+          <div className="grid auto-rows-fr gap-5 grid-cols-[repeat(auto-fill,minmax(300px,1fr))]">
+            {[
+              { name: "Sarah M.", role: "Freelance Content Creator · UK", avatar: "👩", text: "I had zero experience with AI. After reading this ebook I landed my first freelance AI writing client within 2 weeks. The client acquisition blueprint alone was worth everything." },
+              { name: "James K.", role: "University Student · Canada", avatar: "👨", text: "As a student with no budget, this was exactly what I needed. The free tools section helped me start a digital product business using AI. Already made back 10x in digital sales." },
+              { name: "Marcus T.", role: "Digital Agency Owner · USA", avatar: "🧑", text: "The automation workflows chapter blew my mind. I built a content system that now runs on autopilot and generates leads for my agency. This ebook is criminally underpriced at free." },
+              { name: "Priya R.", role: "Social Media Creator · India", avatar: "👩", text: "I was skeptical about another \"make money online\" ebook. But this was completely different — real systems, real tools, and a 7-day plan that I actually followed. Highly recommend." },
+              { name: "Alex V.", role: "AI Consultant · Germany", avatar: "👨", text: "The pricing blueprints changed how I think about my services. I raised my rates by 3x after understanding the value framing explained in this guide. Life-changing stuff." },
+              { name: "Elena W.", role: "Aspiring Entrepreneur · Australia", avatar: "🧑", text: "Perfect for anyone who wants to start making money with AI but doesn't know where to begin. The step-by-step format made it so easy to take action immediately. Highly recommended!" }
+            ].map((t, i) => (
+              <div key={i} data-animate={`tcard-${i}`} className={`group relative p-7 bg-[#ffffff07] border border-[#6b21e8]/22 rounded-[14px] transition-all duration-300 hover:border-[#6b21e8]/40 hover:-translate-y-1 ${visibleElements.has(`tcard-${i}`) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`} style={{ transitionDelay: `${i * 60}ms` }}>
+                <div className="absolute top-6 right-6 text-[#f5c842] text-[11px] tracking-[2px]">★★★★★</div>
+                <div className="font-mono-jet text-[32px] text-[#6b21e8] leading-none mb-3 opacity-50">"</div>
+                <p className="text-[14px] leading-[1.75] text-[#f8f4ff]/70 mb-5">{t.text}</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#6b21e8] to-[#a855f7] flex items-center justify-center text-[16px] shrink-0">{t.avatar}</div>
+                  <div>
+                    <div className="font-bold text-[14px] text-white">{t.name}</div>
+                    <div className="text-[11px] text-[#9490a8] mt-[2px]">{t.role}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FINAL CTA */}
+      <section id="finalcta" className="py-[100px] px-10 text-center bg-gradient-to-br from-[#0a0a16] via-[#1a0a2e] to-[#0a0a16] relative overflow-hidden max-[900px]:py-[70px] max-[900px]:px-5">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_80%_at_50%_50%,rgba(107,33,232,0.15)_0%,transparent_70%)]" />
+        
+        <div className="relative z-10 max-w-[700px] mx-auto">
+          <div data-animate="final-label" className={`font-mono-jet text-[10px] tracking-[4px] text-[#00f5d4] uppercase flex items-center justify-center gap-3 mb-4 transition-all duration-700 ${visibleElements.has('final-label') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            <span>Last Chance</span>
+            <span className="flex-1 max-w-[60px] h-[1px] bg-gradient-to-r from-[#00f5d4] to-transparent" />
+          </div>
+          
+          <h2 data-animate="final-title" className={`font-orbitron text-[clamp(28px,4vw,52px)] font-black leading-[1.1] mb-6 transition-all duration-700 delay-100 ${visibleElements.has('final-title') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            Start Building Your<br />
+            <span className="bg-gradient-to-br from-[#f5c842] to-[#fde68a] bg-clip-text text-transparent">AI Future Today</span>
+          </h2>
+          
+          <p data-animate="final-sub" className={`text-[17px] text-[#f8f4ff]/60 leading-[1.7] mb-12 transition-all duration-700 delay-200 ${visibleElements.has('final-sub') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            The AI economy is growing faster than any job market in history. The skills you build today could define your financial future for the next decade.
+          </p>
+          
+          <a href="#signup" onClick={scrollToSignup} data-animate="final-btn" className={`group relative inline-flex items-center gap-[14px] px-[52px] py-[22px] bg-gradient-to-br from-[#c49a0a] via-[#f5c842] to-[#fde68a] border-none rounded-lg text-[#0a0a0a] font-orbitron text-[14px] font-black tracking-[2px] uppercase cursor-pointer transition-all hover:shadow-[0_0_60px_rgba(245,200,66,0.35),0_0_120px_rgba(245,200,66,0.1)] hover:-translate-y-1 ${visibleElements.has('final-btn') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'} transition-all duration-700 delay-300`}>
+            <span className="absolute inset-0 rounded-lg bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+            ⚡ Get Instant Access Now <span className="group-hover:translate-x-1 transition-transform">→</span>
+          </a>
+          
+          <p data-animate="final-note" className={`mt-6 font-mono-jet text-[11px] tracking-[2px] text-[#9490a8]/40 transition-all duration-700 delay-400 ${visibleElements.has('final-note') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            Free · No credit card · Instant download · No experience required
+          </p>
+          
+          <div data-animate="final-features" className={`flex justify-center gap-8 flex-wrap mt-10 transition-all duration-700 delay-500 max-[900px]:gap-4 ${visibleElements.has('final-features') ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+            {["7 Core AI Skills", "Monetization Blueprints", "7-Day Action Plan", "Tools Directory", "Email Automation"].map((f, i) => (
+              <div key={i} className="flex items-center gap-2 text-[13px] text-[#f8f4ff]/45">
+                <span className="text-[#00f5d4] text-[14px]">✓</span> {f}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="px-10 py-8 border-t border-[#6b21e8]/12 flex justify-between items-center flex-wrap gap-4 max-[900px]:flex-col max-[900px]:text-center max-[900px]:px-5">
+        <div className="font-orbitron text-[11px] tracking-[3px] text-[#a855f7]">AI Income System © 2026</div>
+        <div className="flex gap-6 max-[900px]:justify-center">
+          {["Privacy Policy", "Terms of Use", "Contact"].map(link => (
+            <a key={link} href="#" className="text-[11px] text-[#9490a8] no-underline hover:text-[#a855f7] transition-colors tracking-[1px]">{link}</a>
+          ))}
+        </div>
+        <div className="text-[11px] text-[#9490a8]/30">Powered by AI. Built for Humans.</div>
+      </footer>
+    </div>
+  );
+}
